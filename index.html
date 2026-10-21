@@ -101,11 +101,16 @@
         }, 4000);
       }
 
+      function autoplayPause() {
+        clearInterval(autoplayIntervalId);
+        autoplayIntervalId = undefined;
+      }
+
       autoplayInput.addEventListener("change", function (event) {
         const checked = event.target.checked;
         localStorage.setItem("autoplay", checked);
-        if (checked === false && autoplayIntervalId !== undefined) {
-          clearInterval(autoplayIntervalId);
+        if (checked === false) {
+          autoplayPause();
         } else {
           autoplayStart();
         }
@@ -115,6 +120,10 @@
         const button = event.target.closest(".move");
         if (button === null) {
           return;
+        }
+        if (autoplayIntervalId) {
+          autoplayPause();
+          autoplayStart();
         }
         const allImages = document.querySelectorAll(".carousel-item");
 
