@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carousel</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Carousel</h1>
+
+        <label for="autoplay">
+          <input type="checkbox" id="autoplay" />
+          Autoplay
+        </label>
+      </div>
+
+      <div id="carousel" class="carousel">
+        <div id="carousel-items" class="carousel-items"></div>
+
+        <button data-direction="left" class="move move-left" title="Previous">
+          <svg
+            xmlns="http://w3.org"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button data-direction="right" class="move move-right" title="Next">
+          <svg
+            xmlns="http://w3.org"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const carousel = document.getElementById("carousel");
+      const carouselItems = document.getElementById("carousel-items");
+
+      const data = [
+        "https://cdn.pixabay.com/photo/2023/03/13/19/13/botanical-7850582_1280.jpg",
+        "https://cdn.pixabay.com/photo/2015/03/17/02/01/cubes-677092_640.png",
+        "https://cdn.pixabay.com/photo/2019/07/17/06/37/russia-4343174_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/09/08/13/01/colors-7440953_1280.jpg",
+      ];
+
+      let visibleIndex = 0;
+      let autoplayIntervalId = undefined;
+
+      const dataElements = [];
+      for (let i = 0; i < data.length; i++) {
+        const div = document.createElement("div");
+        div.dataset.index = i;
+        div.classList.add("carousel-item");
+        const img = document.createElement("img");
+        img.src = data[i];
+        div.appendChild(img);
+        dataElements.push(div);
+      }
+      carouselItems.append(...dataElements);
+
+      const autoplayInput = document.getElementById("autoplay");
+      const autoplay = localStorage.getItem("autoplay") === "true";
+      autoplayInput.defaultChecked = autoplay;
+
+      const allImages = document.querySelectorAll(".carousel-item");
+      let imageMaxHeight = 0;
+      for (let i = 0; i < allImages.length; i++) {
+        const imgClient = allImages[i].getBoundingClientRect();
+        if (imgClient.height > imageMaxHeight) {
+          imageMaxHeight = imgClient.height;
+        }
+      }
+      const maxHeight = Math.max(
+        ...[window.innerHeight - 50, imageMaxHeight - 50],
+      );
+      carousel.style.maxHeight = maxHeight + "px";
+
+      function autoplayStart() {
+        autoplayIntervalId = setInterval(function () {
+          document.querySelector(".move-right").click();
+        }, 4000);
+      }
+
+      autoplayInput.addEventListener("change", function (event) {
+        const checked = event.target.checked;
+        localStorage.setItem("autoplay", checked);
+        if (checked === false && autoplayIntervalId !== undefined) {
+          clearInterval(autoplayIntervalId);
+        } else {
+          autoplayStart();
+        }
+      });
+
+      carousel.addEventListener("click", function (event) {
+        const button = event.target.closest(".move");
+        if (button === null) {
+          return;
+        }
+        const allImages = document.querySelectorAll(".carousel-item");
+
+        const direction = button.dataset.direction;
+        if (direction === "right") {
+          if (visibleIndex + 1 > data.length - 1) {
+            visibleIndex = 0;
+          } else {
+            visibleIndex++;
+          }
+        } else {
+          if (visibleIndex - 1 < 0) {
+            visibleIndex = data.length - 1;
+          } else {
+            visibleIndex--;
+          }
+        }
+
+        const displacement = visibleIndex * 100;
+        carouselItems.style.transform = `translateX(-${displacement}%)`;
+      });
+
+      if (autoplay) {
+        autoplayStart();
+      }
+    </script>
+
+    <style>
+      :root {
+        --header-height: 50px;
+        --color-black-opacity: rgba(0, 0, 0, 0.2);
+        --color-black-opacity-hover: rgba(0, 0, 0, 0.6);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0px;
+        background-color: #333;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin: 0px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--header-height);
+      }
+
+      .carousel {
+        position: relative;
+        position: relative;
+        border: 1px solid var(--color-black-opacity);
+        overflow: hidden;
+      }
+
+      .carousel-items {
+        display: flex;
+        transition: transform 0.4s ease-in-out;
+      }
+
+      .carousel-item {
+        flex: 0 0 100%;
+      }
+
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .move {
+        position: absolute;
+        bottom: 50%;
+        padding-top: 4px;
+        background-color: var(--color-black-opacity);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .move:hover {
+        background-color: var(--color-black-opacity-hover);
+      }
+
+      .move-left {
+        left: 8px;
+      }
+
+      .move-right {
+        right: 8px;
+      }
+
+      @media (min-width: 500px) {
+        .container {
+          max-width: 500px;
+          margin-inline: auto;
+        }
+
+        .header {
+          flex-direction: row;
+        }
+      }
+    </style>
+  </body>
+</html>
