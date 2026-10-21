@@ -1,6 +1,4 @@
-# Boring Vanilla Carousel 🎡
-
-A production-ready, fully responsive carousel built with pure **Vanilla JS, HTML5, and CSS3** in less than 100 lines of code. No React, no component libraries, no `npm install`, and absolutely zero framework black magic.
+# Boring Vanilla Carousel
 
 I was bored, so I decided to skip the modern bundle-bloat and remind everyone how the web actually works when you dominate the fundamentals.
 
